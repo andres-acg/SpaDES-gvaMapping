@@ -41,7 +41,7 @@ setupProject(
 # ============================================================
 # This preprocessing script is specific to this example (set preprocess = TRUE to run it).
 # Set preprocess = FALSE if using preformatted datasets, or modify preprocessing.R to match your own data.
-preprocess <- TRUE # if you don't need to preprocess datasets, put FALSE
+preprocess <- TRUE
 
 if (preprocess) {
   source(file.path(getOption("spades.modulePath"), "gvaMapping", "R", "preprocessing.R"))
