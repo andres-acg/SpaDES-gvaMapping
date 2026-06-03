@@ -8,33 +8,25 @@
 ## 4. For future runs, use the project/global.R, and to avoid the automatic restart,
 ##    make sure the RStudio project is open.
 
-
 # ============================================================
 # SETUP ENVIRONMENT
 # ============================================================
-
 options(repos = c(getOption("repos"), PE = "https://predictiveecology.r-universe.dev/"))
-
 if (!require("pak")) install.packages("pak")
 pak::pak(c("PredictiveEcology/Require@usePak",
            "PredictiveEcology/SpaDES.project@development"),
          lib = .libPaths(), ask = FALSE)
-
 Require::Require("SpaDES.project", install = FALSE)
-
 
 # ------------------------------------------------------------
 # PROJECT LOCATION
 # ------------------------------------------------------------
-
 ## please choose where you want the project directory to be placed in your machine.
-projLocation <- "C:/Users/ANCAG6/Documents"
-
+projLocation <- getwd()
 
 # ============================================================
 # TEMP PROJECT INITIALIZATION
 # ============================================================
-
 setupProject(
   name = "SpaDES-gvaMapping",
   paths = list(projectPath = file.path(projLocation, "SpaDES-gvaMapping")),
@@ -47,42 +39,35 @@ setupProject(
 # ============================================================
 # PREPROCESSING
 # ============================================================
-
+# This preprocessing script is specific to this example (set preprocess = TRUE to run it).
+# Set preprocess = FALSE if using preformatted datasets, or modify preprocessing.R to match your own data.
 preprocess <- TRUE # if you don't need to preprocess datasets, put FALSE
 
 if (preprocess) {
   source(file.path(getOption("spades.modulePath"), "gvaMapping", "R", "preprocessing.R"))
 }
 
-
 # ------------------------------------------------------------
 # INPUTS
 # ------------------------------------------------------------
-
 inputs <- list(
-  
   # ------------------------------------------------------------
   # PLOT DATASETS
   # ------------------------------------------------------------
-  
   dataset_list = list(
-    
-    dataset1 = file.path(getOption("spades.inputPath"), "datasets" ,"dataset1", "dataset1_formatted.csv")  # "...path or url..."
-    #dataset2 =  # "...path or url..."
-    
+
+    dataset1 = file.path(getOption("spades.inputPath"), "datasets" ,"dataset1", "dataset1_formatted.csv")
+    #dataset2 =  # "...local path or url..."
   ),
   
   # ------------------------------------------------------------
   # STUDY AREA
   # ------------------------------------------------------------
-  
-  #study_area_path = "https://www.maps.geomatics.gov.nt.ca/Geocortex/Essentials/REST/TempFiles/Export.zip?guid=f3f773d8-443f-4715-9144-b2f2ed465eb1&contentType=application%2Fzip",
   study_area_path = "https://zenodo.org/records/20492584/files/Wekeezhii_SouthernNWT_boreal_caribou_planning_range_regions.zip?download=1" ,
   
   # ------------------------------------------------------------
   # LAND COVER PRODUCTS
   # ------------------------------------------------------------
-  
   land_cover_paths = list(
     
     land_cover1 = "https://datacube-prod-data-public.s3.ca-central-1.amazonaws.com/store/land/landcover/landcover-2010-classification.tif",
@@ -92,10 +77,8 @@ inputs <- list(
   # ------------------------------------------------------------
   # DISTURBANCE DATA (OPTIONAL)
   # ------------------------------------------------------------
-  #disturbances_path = "https://cwfis.cfs.nrcan.gc.ca/downloads/nfdb/fire_poly/current_version/NFDB_poly.zip" #if no disturbance, put NA
   disturbances_path = "https://cwfis.cfs.nrcan.gc.ca/downloads/nfdb/fire_poly/current_version/NFDB_poly_large_fires.zip"
 )
-
 
 
 # ------------------------------------------------------------
@@ -105,23 +88,22 @@ params <- list(
   gvaMapping = list(
     
     # ------------------------------------------------------------
-    # Measurement
+    # Measurement characteristics
     # ------------------------------------------------------------
     measure_class = "intensive", #must be intensive or extensive
     measure_name  = "Biomass",
     unit          = "kg ha⁻¹",
     
     # ------------------------------------------------------------
-    # Sampling sizes
+    # Sampling size(s)
     # ------------------------------------------------------------
     sampling_size_m2 = c(
       
       dataset1 = 0.25
-      
     ),
     
     # ------------------------------------------------------------
-    # Target GVA (same as before)
+    # Target GVA
     # ------------------------------------------------------------
     target_gva = c(
       "mitis", "Cladmit", "MIT", "CLMI","arbuscula", "Cladarb", "ARB",
@@ -131,7 +113,7 @@ params <- list(
     ),
     
     # ------------------------------------------------------------
-    # Land cover products (REPLACES name_land_cover1..4)
+    # Land cover product(s)
     # ------------------------------------------------------------
     list_of_land_cover_names = c(
       
@@ -139,10 +121,13 @@ params <- list(
       land_cover2 = "NTEMS"    
     ),
     
+    # ------------------------------------------------------------
+    # Land cover product(s) reference year
+    # ------------------------------------------------------------
     land_cover_year = 2010,
     
     # ------------------------------------------------------------
-    # Inapplicable classes
+    # Inapplicable classes (may include water classes)
     # ------------------------------------------------------------
     inapplicable_classes_list = list(
       
@@ -151,7 +136,7 @@ params <- list(
     ),
     
     # ------------------------------------------------------------
-    # Water classes
+    # Water classes (for water backgroun on maps)
     # ------------------------------------------------------------
     water_classes_list = list(
       
@@ -160,7 +145,7 @@ params <- list(
     ),
     
     # ------------------------------------------------------------
-    # Abbreviations (REPLACES abbr_land_coverX)
+    # Abbreviations for graphs
     # ------------------------------------------------------------
     abbrev_list = list(
       
@@ -181,7 +166,6 @@ params <- list(
         "18" = "18-Water",
         "19" = "Snow and\nice"
       ),
-      
       land_cover2 = c(
         "20"  = "20-Water",
         "31"  = "31-Snow/Ice*",
@@ -199,17 +183,15 @@ params <- list(
     ),
     
     # ------------------------------------------------------------
-    # Seed
+    # Seed for reproducibility
     # ------------------------------------------------------------
     seed = 81
   )
 )
 
-
 # ============================================================
 # FINAL PROJECT SETUP
 # ============================================================
-
 out <- setupProject(
   name = "SpaDES-gvaMapping",
   paths = list(projectPath = file.path(projLocation, "SpaDES-gvaMapping")),
@@ -221,10 +203,8 @@ out <- setupProject(
   useGit = FALSE
 )
 
-
 # ============================================================
 # RUN MODULE
 # ============================================================
-
 out2 <- SpaDES.core::simInitAndSpades2(out)
 
