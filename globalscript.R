@@ -23,11 +23,7 @@
 options(repos = c(getOption("repos"), PE = "https://predictiveecology.r-universe.dev/"))
 if (!require("pak")) install.packages("pak")
 pak::pak(c("PredictiveEcology/Require@usePak",
-<<<<<<< HEAD
            "PredictiveEcology/SpaDES.project@75fb77ad865304d51506d1b9899b77618b589e49"),
-=======
-           "PredictiveEcology/SpaDES.project@development"),
->>>>>>> 3f747c4119ddb3eda71b71bace1c11292594c47b
          lib = .libPaths(), ask = FALSE)
 Require::Require("SpaDES.project", install = FALSE)
 
@@ -35,11 +31,7 @@ Require::Require("SpaDES.project", install = FALSE)
 # PROJECT LOCATION
 # ------------------------------------------------------------
 ## please choose where you want the project directory to be placed in your machine.
-<<<<<<< HEAD
-projLocation <- "~/Projects"
-=======
 projLocation <- getwd()
->>>>>>> 3f747c4119ddb3eda71b71bace1c11292594c47b
 
 # ============================================================
 # TEMP PROJECT INITIALIZATION
