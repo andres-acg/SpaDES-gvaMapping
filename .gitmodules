@@ -1,0 +1,3 @@
+[submodule "modules/gvaMapping"]
+	path = modules/gvaMapping
+	url = git@github.com:andres-acg/gvaMapping.git
