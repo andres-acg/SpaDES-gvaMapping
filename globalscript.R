@@ -31,12 +31,12 @@ Require::Require("SpaDES.project", install = FALSE)
 # PROJECT LOCATION
 # ------------------------------------------------------------
 ## please choose where you want the project directory to be placed in your machine.
-projLocation <- getwd()
+projLocation <- "~/Projects"
 
 # ============================================================
 # TEMP PROJECT INITIALIZATION
 # ============================================================
-setupProject(
+out <- setupProject(
   name = "SpaDES-gvaMapping",
   paths = list(projectPath = file.path(projLocation, "SpaDES-gvaMapping")),
   modules = "andres-acg/gvaMapping",
@@ -53,7 +53,7 @@ setupProject(
 preprocess <- TRUE
 
 if (preprocess) {
-  source(file.path(getOption("spades.modulePath"), "gvaMapping", "R", "preprocessing.R"))
+  source(file.path(out$paths$modulePath, "gvaMapping", "R", "preprocessing.R"))
 }
 
 # ------------------------------------------------------------
@@ -68,37 +68,24 @@ inputs <- list(
     dataset1 = file.path(getOption("spades.inputPath"), "datasets" ,"dataset1", "dataset1_formatted.csv")
     #dataset2 =  # "...local path or url..."
   ),
-<<<<<<< HEAD
 
-=======
-  
->>>>>>> 3f747c4119ddb3eda71b71bace1c11292594c47b
+
   # ------------------------------------------------------------
   # STUDY AREA
   # ------------------------------------------------------------
   study_area_path = "https://zenodo.org/records/20492584/files/Wekeezhii_SouthernNWT_boreal_caribou_planning_range_regions.zip?download=1" ,
-<<<<<<< HEAD
 
-=======
-  
->>>>>>> 3f747c4119ddb3eda71b71bace1c11292594c47b
+
   # ------------------------------------------------------------
   # LAND COVER PRODUCTS
   # ------------------------------------------------------------
   land_cover_paths = list(
-<<<<<<< HEAD
 
     land_cover1 = "https://datacube-prod-data-public.s3.ca-central-1.amazonaws.com/store/land/landcover/landcover-2010-classification.tif",
     land_cover2 = "https://opendata.nfis.org/downloads/forest_change/CA_forest_VLCE2_2010.zip"
   ),
 
-=======
-    
-    land_cover1 = "https://datacube-prod-data-public.s3.ca-central-1.amazonaws.com/store/land/landcover/landcover-2010-classification.tif",
-    land_cover2 = "https://opendata.nfis.org/downloads/forest_change/CA_forest_VLCE2_2010.zip"
-  ),
-  
->>>>>>> 3f747c4119ddb3eda71b71bace1c11292594c47b
+
   # ------------------------------------------------------------
   # DISTURBANCE DATA (OPTIONAL)
   # ------------------------------------------------------------
@@ -111,123 +98,69 @@ inputs <- list(
 # ------------------------------------------------------------
 params <- list(
   gvaMapping = list(
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> 3f747c4119ddb3eda71b71bace1c11292594c47b
     # ------------------------------------------------------------
     # Measurement characteristics
     # ------------------------------------------------------------
     measure_class = "intensive", #must be intensive or extensive
     measure_name  = "Biomass",
     unit          = "kg ha⁻¹",
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> 3f747c4119ddb3eda71b71bace1c11292594c47b
     # ------------------------------------------------------------
     # Sampling size(s)
     # ------------------------------------------------------------
     sampling_size_m2 = c(
-<<<<<<< HEAD
 
       dataset1 = 0.25
     ),
 
-=======
-      
-      dataset1 = 0.25
-    ),
-    
->>>>>>> 3f747c4119ddb3eda71b71bace1c11292594c47b
     # ------------------------------------------------------------
     # Target GVA
     # ------------------------------------------------------------
     target_gva = c(
       "mitis", "Cladmit", "MIT", "CLMI","arbuscula", "Cladarb", "ARB",
       "rangiferina", "Cladran", "RAN", "CLRA", "stygia", "Cladsty", "STY",
-<<<<<<< HEAD
       "stellaris", "Cladste", "STE", "CLST", "uncialis", "Cladunc", "unc",
       "CLADUNC", "amaurocrea", "Cladama", "AMA", "spp."
     ),
 
-=======
-      "stellaris", "Cladste", "STE", "CLST", "uncialis", "Cladunc", "unc", 
-      "CLADUNC", "amaurocrea", "Cladama", "AMA", "spp."
-    ),
-    
->>>>>>> 3f747c4119ddb3eda71b71bace1c11292594c47b
     # ------------------------------------------------------------
     # Land cover product(s)
     # ------------------------------------------------------------
     list_of_land_cover_names = c(
-<<<<<<< HEAD
 
       land_cover1 = "LCC10",
       land_cover2 = "NTEMS"
     ),
 
-=======
-      
-      land_cover1 = "LCC10", 
-      land_cover2 = "NTEMS"    
-    ),
-    
->>>>>>> 3f747c4119ddb3eda71b71bace1c11292594c47b
     # ------------------------------------------------------------
     # Land cover product(s) reference year
     # ------------------------------------------------------------
     land_cover_year = 2010,
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> 3f747c4119ddb3eda71b71bace1c11292594c47b
     # ------------------------------------------------------------
     # Inapplicable classes (may include water classes)
     # ------------------------------------------------------------
     inapplicable_classes_list = list(
-<<<<<<< HEAD
 
       land_cover1 = c(17, 18),
       land_cover2 = c(20, 31)
     ),
 
-=======
-      
-      land_cover1 = c(17, 18),
-      land_cover2 = c(20, 31)
-    ),
-    
->>>>>>> 3f747c4119ddb3eda71b71bace1c11292594c47b
     # ------------------------------------------------------------
     # Water classes (for water backgroun on maps)
     # ------------------------------------------------------------
     water_classes_list = list(
-<<<<<<< HEAD
 
       land_cover1 = 18,
       land_cover2 = 20
     ),
 
-=======
-      
-      land_cover1 = 18,
-      land_cover2 = 20
-    ),
-    
->>>>>>> 3f747c4119ddb3eda71b71bace1c11292594c47b
     # ------------------------------------------------------------
     # Abbreviations for graphs
     # ------------------------------------------------------------
     abbrev_list = list(
-<<<<<<< HEAD
 
-=======
-      
->>>>>>> 3f747c4119ddb3eda71b71bace1c11292594c47b
       land_cover1 = c(
         "1"  = "1-Needle.\nforest",
         "2"  = "2-Taiga \nneedle.\nforest*",
@@ -260,11 +193,7 @@ params <- list(
         "230" = "230-Mixed.*"
       )
     ),
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> 3f747c4119ddb3eda71b71bace1c11292594c47b
     # ------------------------------------------------------------
     # Seed for reproducibility
     # ------------------------------------------------------------
@@ -290,7 +219,3 @@ out <- setupProject(
 # RUN MODULE
 # ============================================================
 out2 <- SpaDES.core::simInitAndSpades2(out)
-<<<<<<< HEAD
-=======
-
->>>>>>> 3f747c4119ddb3eda71b71bace1c11292594c47b
