@@ -22,8 +22,8 @@
 # ============================================================
 options(repos = c(getOption("repos"), PE = "https://predictiveecology.r-universe.dev/"))
 if (!require("pak")) install.packages("pak")
-pak::pak(c("PredictiveEcology/Require@usePak",
-           "PredictiveEcology/SpaDES.project@75fb77ad865304d51506d1b9899b77618b589e49"),
+pak::pak(c("PredictiveEcology/Require@development",
+           "PredictiveEcology/SpaDES.project@development"),
          lib = .libPaths(), ask = FALSE)
 Require::Require("SpaDES.project", install = FALSE)
 
