@@ -43,11 +43,11 @@ By default this script's `land_cover_paths` point at two full, national-scale la
 
 If you'd rather run something lighter, unset `land_cover_paths` (and `study_area_path`) the same way `dataset_list` is left unset below — `gvaMapping`'s own `Init()` step will auto-fetch a smaller, study-area-cropped public land cover default (SCANFI) instead. See `gvaMapping`'s [README, "Running with no inputs"](https://github.com/andres-acg/gvaMapping#running-with-no-inputs-public-data-only-defaults).
 
-## Plot data: no private data is bundled
+## Plot data
 
-The field plot data used by this project's own analysis (`dataset_list`, referred to as `dataset1`–`dataset5` in `gvaMapping/R/preprocessing.R`) is private and lives only on the original researcher's machine. It is not, and will never be, included in this or the `gvaMapping` repository.
+This project's own analysis draws on several field plot datasets (`dataset_list`, referred to as `dataset1`–`dataset5` in `gvaMapping/R/preprocessing.R`). Their accessibility varies — some are private field data, others are hosted on repositories with their own access terms — but only one, dataset1 (Deninu Kué First Nation et al. 2026), is currently wired into this script and the `gvaMapping` module as a public, automatically downloaded default, via Zenodo ([doi:10.5281/zenodo.20054559](https://doi.org/10.5281/zenodo.20054559)).
 
-Accordingly, `dataset_list` is deliberately left **unset** in this script. With no `dataset_list` supplied, `gvaMapping`'s `Init()` step auto-fetches its own public default — the Deninu Kué First Nation et al. (2026) lichen plot dataset from Zenodo ([doi:10.5281/zenodo.20054559](https://doi.org/10.5281/zenodo.20054559)) — so the script still runs to completion, end to end, on public data alone, producing a real result from real (if more limited) data rather than a placeholder. If you have your own preformatted plot dataset(s), the script shows, commented out, where to point `dataset_list` at them instead.
+Accordingly, `dataset_list` is deliberately left **unset** in this script. With no `dataset_list` supplied, `gvaMapping`'s `Init()` step fetches that Zenodo default automatically, so the script still runs to completion, end to end, on public data alone, producing a real result from real (if more limited) data rather than a placeholder. The other datasets aren't auto-fetched here regardless of where they're hosted; if you have access to them, the script shows, commented out, where to point `dataset_list` at your own preformatted data instead.
 
 ## Outputs
 
