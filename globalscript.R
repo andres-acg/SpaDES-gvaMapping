@@ -63,25 +63,36 @@ out <- setupProject(
   times = list(start = 1, end = 1),
   Restart = TRUE,
   useGit = FALSE,
+  sideEffects = {
+    ## Set preprocess <- TRUE if you have your own raw plot dataset(s) and want
+    ## to use preprocessing.R's loader/conversion functions (one per raw data
+    ## format -- see gvaMapping/R/preprocessing.R) to build the formatted
+    ## CSV(s) gvaMapping expects. Sourcing it here makes those functions
+    ## available in this session; call whichever loader(s) match your raw
+    ## data, write out the result, then point dataset_list (below) at it.
+    ##
+    ## Default is FALSE, which leaves dataset_list unset below: with no
+    ## dataset_list supplied, gvaMapping's own Init() step auto-fetches its
+    ## public default instead (dataset1, Deninu Kue First Nation et al. 2026,
+    ## via Zenodo, doi:10.5281/zenodo.20054559) -- so this script still runs
+    ## end-to-end with zero setup. Set preprocess <- TRUE (and uncomment/fill
+    ## in dataset_list below) once you have your own preformatted dataset(s)
+    ## -- dataset1 and/or any others -- to use instead.
+    preprocess <- FALSE
+    if (preprocess) {
+      source(file.path(paths$modulePath, "gvaMapping", "R", "preprocessing.R"))
+    }
+  },
   # ------------------------------------------------------------
   # PLOT DATASETS
   # ------------------------------------------------------------
-  # No dataset_list is supplied here on purpose. The raw field plot data this
-  # project's own analysis draws on (datasets 1-5; see the loaders in
-  # gvaMapping/R/preprocessing.R) has mixed accessibility -- some private,
-  # some hosted elsewhere with their own access terms -- and none of it is
-  # committed to either repo, so this public script cannot point at a
-  # preformatted CSV that doesn't exist for a fresh reviewer. Leaving
-  # dataset_list unset lets gvaMapping's own Init() step auto-fetch its public
-  # default instead: dataset1 (Deninu Kue First Nation et al. 2026, Zenodo
-  # doi:10.5281/zenodo.20054559). That keeps this script runnable end-to-end
-  # on public data alone. See gvaMapping's README, "Running with no inputs",
-  # for details.
-  #
-  # If you have your own preformatted plot dataset(s), point dataset_list at
-  # them here instead, e.g.:
+  # Only takes effect once preprocess <- TRUE above and you've built your own
+  # preformatted CSV(s) (e.g. with a loader from preprocessing.R, or any
+  # other data you have access to -- some of the project's datasets are on
+  # Dryad rather than private). Left unset/commented otherwise, which is what
+  # lets gvaMapping's public Zenodo default supply dataset1 automatically.
   # dataset_list = list(
-  #   dataset1 = "path/or/url/to/your_formatted_dataset1.csv"
+  #   dataset1 = file.path(paths$inputPath, "datasets", "dataset1", "dataset1_formatted.csv")
   #   #dataset2 = "...local path or url..."
   # ),
   # ------------------------------------------------------------

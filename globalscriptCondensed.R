@@ -58,15 +58,20 @@ out <- setupProject(
   times = list(start = 1, end = 1),
   Restart = TRUE,
   useGit = FALSE,
+  sideEffects = {
+    # Set preprocess <- TRUE if you have your own raw plot dataset(s) -- see
+    # globalscript.R for the full explanation. Default FALSE + dataset_list
+    # left unset below means gvaMapping's public Zenodo default (dataset1)
+    # is used instead, so this script runs end-to-end with zero setup.
+    preprocess <- FALSE
+    if (preprocess) {
+      source(file.path(paths$modulePath, "gvaMapping", "R", "preprocessing.R"))
+    }
+  },
   # INPUTS
-  # No dataset_list is supplied here on purpose -- see globalscript.R for why
-  # (the raw plot data it would point to has mixed accessibility and none of
-  # it is committed to either repo). Leaving it unset lets gvaMapping's
-  # Init() auto-fetch its public default (dataset1, Zenodo
-  # doi:10.5281/zenodo.20054559) so this script still runs end-to-end on
-  # public data alone.
+  # Only takes effect once preprocess <- TRUE above -- see globalscript.R.
   # dataset_list = list(
-  #   dataset1 = "path/or/url/to/your_formatted_dataset1.csv"
+  #   dataset1 = file.path(paths$inputPath, "datasets", "dataset1", "dataset1_formatted.csv")
   #   #dataset2 = "...local path or url..."
   # ),
   study_area_path = "https://zenodo.org/records/20492584/files/Wekeezhii_SouthernNWT_boreal_caribou_planning_range_regions.zip?download=1",
