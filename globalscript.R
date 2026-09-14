@@ -12,7 +12,7 @@
 ##    It doesn't matter where it is saved or the name, but I suggest `global.R` for the name.
 ## 2. Run the script. It may take a while to install all packages the first time
 ##    and RStudio will automatically restart and open the new project. The R script will be copied into the
-##    the project folder and all packages will be instalyled into a project-specific library.
+##    the project folder and all packages will be installed into a project-specific library.
 ## 3. Re-run the script after the automatic restart. The original R script can now be deleted (from Step 1).
 ## 4. For future runs, use the SpaDES-gvaMapping/global.R, and to avoid the automatic restart,
 ##    make sure the RStudio project is open.
@@ -27,13 +27,8 @@ if (getRversion() < "4.5.0") {
 
 options(repos = c(getOption("repos"), PE = "https://predictiveecology.r-universe.dev/"))
 if (!require("pak")) install.packages("pak")
-## reproducible@development and SpaDES.tools@development are installed
-## explicitly here (not just left to be pulled in transitively) because
-## SpaDES.core@development requires both specifically -- see its own
-## Remotes: field. Leaving this to transitive resolution is what caused
-## "object 'padYears' is not exported by 'namespace:reproducible'" for a
-## reviewer whose machine already had an older/CRAN reproducible installed:
-## padYears() only exists on reproducible's development branch.
+## Installs the specific package versions this script depends on, from
+## their GitHub development branches (some fixes it needs aren't on CRAN yet).
 pak::pak(c("PredictiveEcology/Require@development",
            "PredictiveEcology/reproducible@development",
            "PredictiveEcology/SpaDES.tools@development",
@@ -53,44 +48,45 @@ projLocation <- "~/Projects"
 out <- setupProject(
   name = "SpaDES-gvaMapping",
   paths = list(projectPath = file.path(projLocation, "SpaDES-gvaMapping")),
-  ## Pinned to a specific commit, not a floating branch: neither this repo nor
-  ## gvaMapping has any tags/releases, so "main" means "whatever the latest
-  ## commit happens to be when you run this" -- not reproducible for a
-  ## reviewer running it after further development happens. This SHA is the
-  ## commit tested for review; update it deliberately (and re-test) if you
-  ## need a newer version of the module, rather than removing the pin.
+  ## Pinned to a specific version of the gvaMapping module, so this script
+  ## keeps working the same way even after the module is updated further.
+  ## Change this on purpose (and re-test) if you want a newer version.
   modules = "andres-acg/gvaMapping@ebdae7a094e019f3723a39b77ad3c4965b96c62a",
   times = list(start = 1, end = 1),
   Restart = TRUE,
   useGit = FALSE,
   sideEffects = {
-    ## Set preprocess <- TRUE if you have your own raw plot dataset(s) and want
-    ## to use preprocessing.R's loader/conversion functions (one per raw data
-    ## format -- see gvaMapping/R/preprocessing.R) to build the formatted
-    ## CSV(s) gvaMapping expects. Sourcing it here makes those functions
-    ## available in this session; call whichever loader(s) match your raw
-    ## data, write out the result, then point dataset_list (below) at it.
-    ##
-    ## Default is FALSE, which leaves dataset_list unset below: with no
-    ## dataset_list supplied, gvaMapping's own Init() step auto-fetches its
-    ## public default instead (dataset1, Deninu Kue First Nation et al. 2026,
-    ## via Zenodo, doi:10.5281/zenodo.20054559) -- so this script still runs
-    ## end-to-end with zero setup. Set preprocess <- TRUE (and uncomment/fill
-    ## in dataset_list below) once you have your own preformatted dataset(s)
-    ## -- dataset1 and/or any others -- to use instead.
+    ## Set preprocess <- TRUE to build dataset_list (below) from your own
+    ## data, using the loader functions in gvaMapping/R/preprocessing.R (one
+    ## per raw data format). Left FALSE, gvaMapping downloads and formats a
+    ## public dataset (dataset1) automatically instead, so this script still
+    ## runs end to end with no data of your own.
     preprocess <- FALSE
     if (preprocess) {
       source(file.path(paths$modulePath, "gvaMapping", "R", "preprocessing.R"))
+
+      ## Example: build dataset1 directly from its own public link (Deninu
+      ## Kue First Nation et al. 2026, via Zenodo). Add any other dataset you
+      ## have the same way, using whichever loader in preprocessing.R matches
+      ## its raw format.
+      dataset1_dir <- file.path(paths$inputPath, "datasets", "dataset1")
+      dir.create(dataset1_dir, recursive = TRUE, showWarnings = FALSE)
+      dataset1_raw <- reproducible::prepInputs(
+        url = paste0("https://zenodo.org/records/20054559/files/EA3922%20Lichen%20",
+                     "Plot%20Data_ALL%20YEARS_SUMMARY%20BIOMASS%20three%20ways.xlsx",
+                     "?download=1"),
+        destinationPath = dataset1_dir, fun = NA
+      )
+      write.csv(loadDeninuBiomassData(raw_datasetA = dataset1_raw),
+                file.path(dataset1_dir, "dataset1_formatted.csv"), row.names = FALSE)
     }
   },
   # ------------------------------------------------------------
   # PLOT DATASETS
   # ------------------------------------------------------------
-  # Only takes effect once preprocess <- TRUE above and you've built your own
-  # preformatted CSV(s) (e.g. with a loader from preprocessing.R, or any
-  # other data you have access to -- some of the project's datasets are on
-  # Dryad rather than private). Left unset/commented otherwise, which is what
-  # lets gvaMapping's public Zenodo default supply dataset1 automatically.
+  # Only used once preprocess <- TRUE above. dataset1 here comes from the
+  # example above (built from its own link); add any other dataset(s) you
+  # have the same way, or point straight at an already-formatted file or URL.
   # dataset_list = list(
   #   dataset1 = file.path(paths$inputPath, "datasets", "dataset1", "dataset1_formatted.csv")
   #   #dataset2 = "...local path or url..."

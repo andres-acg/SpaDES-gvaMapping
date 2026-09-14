@@ -12,7 +12,7 @@
 ##    It doesn't matter where it is saved or the name, but I suggest `global.R` for the name.
 ## 2. Run the script. It may take a while to install all packages the first time
 ##    and RStudio will automatically restart and open the new project. The R script will be copied into the
-##    the project folder and all packages will be instalyled into a project-specific library.
+##    the project folder and all packages will be installed into a project-specific library.
 ## 3. Re-run the script after the automatic restart. The original R script can now be deleted (from Step 1).
 ## 4. For future runs, use the SpaDES-gvaMapping/global.R, and to avoid the automatic restart,
 ##    make sure the RStudio project is open.
@@ -27,11 +27,8 @@ if (getRversion() < "4.5.0") {
 
 options(repos = c(getOption("repos"), PE = "https://predictiveecology.r-universe.dev/"))
 if (!require("pak")) install.packages("pak")
-# reproducible@development and SpaDES.tools@development are installed
-# explicitly (see globalscript.R for why): SpaDES.core@development needs
-# both specifically, and leaving that to transitive resolution is what causes
-# "object 'padYears' is not exported by 'namespace:reproducible'" on a
-# machine that already has an older/CRAN reproducible installed.
+# Installs the specific package versions this script depends on -- see
+# globalscript.R for why these come from GitHub development branches.
 pak::pak(c("PredictiveEcology/Require@development",
            "PredictiveEcology/reproducible@development",
            "PredictiveEcology/SpaDES.tools@development",
@@ -51,25 +48,31 @@ projLocation <- "~/Projects"
 out <- setupProject(
   name = "SpaDES-gvaMapping",
   paths = list(projectPath = file.path(projLocation, "SpaDES-gvaMapping")),
-  # Pinned to a specific commit, not a floating branch -- see globalscript.R
-  # for why (neither repo has tags/releases). Update deliberately if a newer
-  # module version is needed, rather than removing the pin.
+  # Pinned to a specific module version -- see globalscript.R for why.
   modules = "andres-acg/gvaMapping@ebdae7a094e019f3723a39b77ad3c4965b96c62a",
   times = list(start = 1, end = 1),
   Restart = TRUE,
   useGit = FALSE,
   sideEffects = {
-    # Set preprocess <- TRUE if you have your own raw plot dataset(s) -- see
-    # globalscript.R for the full explanation. Default FALSE + dataset_list
-    # left unset below means gvaMapping's public Zenodo default (dataset1)
-    # is used instead, so this script runs end-to-end with zero setup.
+    # Set preprocess <- TRUE to build dataset_list from your own data -- see
+    # globalscript.R for the full explanation and a worked dataset1 example.
     preprocess <- FALSE
     if (preprocess) {
       source(file.path(paths$modulePath, "gvaMapping", "R", "preprocessing.R"))
+
+      dataset1_dir <- file.path(paths$inputPath, "datasets", "dataset1")
+      dir.create(dataset1_dir, recursive = TRUE, showWarnings = FALSE)
+      dataset1_raw <- reproducible::prepInputs(
+        url = paste0("https://zenodo.org/records/20054559/files/EA3922%20Lichen%20",
+                     "Plot%20Data_ALL%20YEARS_SUMMARY%20BIOMASS%20three%20ways.xlsx",
+                     "?download=1"),
+        destinationPath = dataset1_dir, fun = NA
+      )
+      write.csv(loadDeninuBiomassData(raw_datasetA = dataset1_raw),
+                file.path(dataset1_dir, "dataset1_formatted.csv"), row.names = FALSE)
     }
   },
-  # INPUTS
-  # Only takes effect once preprocess <- TRUE above -- see globalscript.R.
+  # INPUTS -- only takes effect once preprocess <- TRUE above.
   # dataset_list = list(
   #   dataset1 = file.path(paths$inputPath, "datasets", "dataset1", "dataset1_formatted.csv")
   #   #dataset2 = "...local path or url..."

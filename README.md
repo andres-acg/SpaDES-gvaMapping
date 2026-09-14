@@ -13,7 +13,7 @@ Both do the same thing and can be run interchangeably.
 
 ## What this script does
 
-1. Checks the running R version, then installs [`pak`](https://pak.r-lib.org/), followed by the development versions of [`Require`](https://github.com/PredictiveEcology/Require), [`reproducible`](https://github.com/PredictiveEcology/reproducible), [`SpaDES.tools`](https://github.com/PredictiveEcology/SpaDES.tools), and [`SpaDES.project`](https://github.com/PredictiveEcology/SpaDES.project) — the tooling `setupProject()` needs. `reproducible` and `SpaDES.tools` are installed explicitly, not left to be pulled in as transitive dependencies, because `SpaDES.core@development` needs both from their development branches specifically; leaving that to chance is what previously broke the script for a reviewer whose machine already had an older `reproducible` installed (`padYears` only exists on its development branch).
+1. Checks the running R version, then installs [`pak`](https://pak.r-lib.org/), followed by the development versions of [`Require`](https://github.com/PredictiveEcology/Require), [`reproducible`](https://github.com/PredictiveEcology/reproducible), [`SpaDES.tools`](https://github.com/PredictiveEcology/SpaDES.tools), and [`SpaDES.project`](https://github.com/PredictiveEcology/SpaDES.project) — the specific package versions `setupProject()` needs, from their GitHub development branches since some of the fixes required aren't on CRAN yet.
 2. Calls `setupProject()`, which:
    - creates a self-contained project folder (with its own package library, so nothing is installed into your regular R library),
    - downloads the `gvaMapping` module from a **pinned commit** on this GitHub account (not a floating branch — neither this repo nor `gvaMapping` has tags or releases, so a branch reference alone isn't reproducible),
@@ -47,9 +47,11 @@ If you'd rather run something lighter, unset `land_cover_paths` (and `study_area
 
 ## Plot data
 
-This project's own analysis draws on several field plot datasets (`dataset_list`, referred to as `dataset1`–`dataset5` in `gvaMapping/R/preprocessing.R`). Their accessibility varies — some are private field data, others are hosted on repositories with their own access terms — but only one, dataset1 (Deninu Kué First Nation et al. 2026), is currently wired into this script and the `gvaMapping` module as a public, automatically downloaded default, via Zenodo ([doi:10.5281/zenodo.20054559](https://doi.org/10.5281/zenodo.20054559)).
+This project's own analysis draws on several field plot datasets (`dataset_list`, referred to as `dataset1`–`dataset5` in `gvaMapping/R/preprocessing.R`). Their accessibility varies — some are private field data, others are hosted on repositories with their own access terms — but only one, dataset1 (Deninu Kué First Nation et al. 2026), is public, via Zenodo ([doi:10.5281/zenodo.20054559](https://doi.org/10.5281/zenodo.20054559)).
 
-Accordingly, `dataset_list` is deliberately left **unset** in this script. With no `dataset_list` supplied, `gvaMapping`'s `Init()` step fetches that Zenodo default automatically, so the script still runs to completion, end to end, on public data alone, producing a real result from real (if more limited) data rather than a placeholder. The other datasets aren't auto-fetched here regardless of where they're hosted; if you have access to them, the script shows, commented out, where to point `dataset_list` at your own preformatted data instead.
+Accordingly, `dataset_list` is deliberately left **unset** in this script by default (`preprocess <- FALSE` in the `sideEffects` block). With no `dataset_list` supplied, `gvaMapping`'s `Init()` step downloads and formats that same dataset1 record automatically, so the script still runs to completion, end to end, on public data alone, producing a real result from real (if more limited) data rather than a placeholder.
+
+If you'd rather see that step happen directly in this script — or you have your own dataset(s) to add — set `preprocess <- TRUE` in the `sideEffects` block. It includes a working example that builds dataset1 straight from its Zenodo link, plus a place to add any other dataset you have access to, using whichever loader in `gvaMapping/R/preprocessing.R` matches its raw format; then uncomment `dataset_list` below it to point at the result.
 
 ## Outputs
 
