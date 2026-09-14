@@ -20,9 +20,23 @@
 # ============================================================
 # SETUP ENVIRONMENT
 # ============================================================
+if (getRversion() < "4.5.0") {
+  stop("This script requires R >= 4.5 (older versions have not been tested). ",
+       "You are running R ", getRversion(), ". Please install a newer R and retry.")
+}
+
 options(repos = c(getOption("repos"), PE = "https://predictiveecology.r-universe.dev/"))
 if (!require("pak")) install.packages("pak")
+## reproducible@development and SpaDES.tools@development are installed
+## explicitly here (not just left to be pulled in transitively) because
+## SpaDES.core@development requires both specifically -- see its own
+## Remotes: field. Leaving this to transitive resolution is what caused
+## "object 'padYears' is not exported by 'namespace:reproducible'" for a
+## reviewer whose machine already had an older/CRAN reproducible installed:
+## padYears() only exists on reproducible's development branch.
 pak::pak(c("PredictiveEcology/Require@development",
+           "PredictiveEcology/reproducible@development",
+           "PredictiveEcology/SpaDES.tools@development",
            "PredictiveEcology/SpaDES.project@development"),
          lib = .libPaths(), ask = FALSE)
 Require::Require("SpaDES.project", install = FALSE)
@@ -39,26 +53,37 @@ projLocation <- "~/Projects"
 out <- setupProject(
   name = "SpaDES-gvaMapping",
   paths = list(projectPath = file.path(projLocation, "SpaDES-gvaMapping")),
-  modules = "andres-acg/gvaMapping",
+  ## Pinned to a specific commit, not a floating branch: neither this repo nor
+  ## gvaMapping has any tags/releases, so "main" means "whatever the latest
+  ## commit happens to be when you run this" -- not reproducible for a
+  ## reviewer running it after further development happens. This SHA is the
+  ## commit tested for review; update it deliberately (and re-test) if you
+  ## need a newer version of the module, rather than removing the pin.
+  modules = "andres-acg/gvaMapping@ebdae7a094e019f3723a39b77ad3c4965b96c62a",
   times = list(start = 1, end = 1),
   Restart = TRUE,
   useGit = FALSE,
-  sideEffects = {
-    ## This preprocessing script is specific to this example (set preprocess = TRUE to run it).
-    ## Set to FALSE if using preformatted datasets, or modify preprocessing.R to match your own data.
-    ## if FALSE, adjust the path to dataset1  below.
-    preprocess <- TRUE
-    if (preprocess) {
-      source(file.path(paths$modulePath, "gvaMapping", "R", "preprocessing.R"))
-    }
-  },
   # ------------------------------------------------------------
   # PLOT DATASETS
   # ------------------------------------------------------------
-  dataset_list = list(
-    dataset1 = file.path(paths$inputPath, "datasets" ,"dataset1", "dataset1_formatted.csv") ## adjust if preprocess is FALSE above
-    #dataset2 =  # "...local path or url..."
-  ),
+  # No dataset_list is supplied here on purpose. The raw field plot data this
+  # project's own analysis draws on (datasets 1-5; see the loaders in
+  # gvaMapping/R/preprocessing.R) has mixed accessibility -- some private,
+  # some hosted elsewhere with their own access terms -- and none of it is
+  # committed to either repo, so this public script cannot point at a
+  # preformatted CSV that doesn't exist for a fresh reviewer. Leaving
+  # dataset_list unset lets gvaMapping's own Init() step auto-fetch its public
+  # default instead: dataset1 (Deninu Kue First Nation et al. 2026, Zenodo
+  # doi:10.5281/zenodo.20054559). That keeps this script runnable end-to-end
+  # on public data alone. See gvaMapping's README, "Running with no inputs",
+  # for details.
+  #
+  # If you have your own preformatted plot dataset(s), point dataset_list at
+  # them here instead, e.g.:
+  # dataset_list = list(
+  #   dataset1 = "path/or/url/to/your_formatted_dataset1.csv"
+  #   #dataset2 = "...local path or url..."
+  # ),
   # ------------------------------------------------------------
   # STUDY AREA
   # ------------------------------------------------------------

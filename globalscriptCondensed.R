@@ -20,9 +20,21 @@
 # ============================================================
 # SETUP ENVIRONMENT
 # ============================================================
+if (getRversion() < "4.5.0") {
+  stop("This script requires R >= 4.5 (older versions have not been tested). ",
+       "You are running R ", getRversion(), ". Please install a newer R and retry.")
+}
+
 options(repos = c(getOption("repos"), PE = "https://predictiveecology.r-universe.dev/"))
 if (!require("pak")) install.packages("pak")
+# reproducible@development and SpaDES.tools@development are installed
+# explicitly (see globalscript.R for why): SpaDES.core@development needs
+# both specifically, and leaving that to transitive resolution is what causes
+# "object 'padYears' is not exported by 'namespace:reproducible'" on a
+# machine that already has an older/CRAN reproducible installed.
 pak::pak(c("PredictiveEcology/Require@development",
+           "PredictiveEcology/reproducible@development",
+           "PredictiveEcology/SpaDES.tools@development",
            "PredictiveEcology/SpaDES.project@development"),
          lib = .libPaths(), ask = FALSE)
 Require::Require("SpaDES.project", install = FALSE)
@@ -39,24 +51,24 @@ projLocation <- "~/Projects"
 out <- setupProject(
   name = "SpaDES-gvaMapping",
   paths = list(projectPath = file.path(projLocation, "SpaDES-gvaMapping")),
-  modules = "andres-acg/gvaMapping",
+  # Pinned to a specific commit, not a floating branch -- see globalscript.R
+  # for why (neither repo has tags/releases). Update deliberately if a newer
+  # module version is needed, rather than removing the pin.
+  modules = "andres-acg/gvaMapping@ebdae7a094e019f3723a39b77ad3c4965b96c62a",
   times = list(start = 1, end = 1),
   Restart = TRUE,
   useGit = FALSE,
-  sideEffects = {
-    ## This preprocessing script is specific to this example (set preprocess = TRUE to run it).
-    ## Set to FALSE if using preformatted datasets, or modify preprocessing.R to match your own data.
-    ## if FALSE, adjust the path to dataset1  below.
-    preprocess <- TRUE
-    if (preprocess) {
-      source(file.path(paths$modulePath, "gvaMapping", "R", "preprocessing.R"))
-    }
-  },
   # INPUTS
-  dataset_list = list(
-    dataset1 = file.path(paths$inputPath, "datasets" ,"dataset1", "dataset1_formatted.csv") ## adjust if preprocess is FALSE above
-    #dataset2 =  # "...local path or url..."
-  ),
+  # No dataset_list is supplied here on purpose -- see globalscript.R for why
+  # (the raw plot data it would point to has mixed accessibility and none of
+  # it is committed to either repo). Leaving it unset lets gvaMapping's
+  # Init() auto-fetch its public default (dataset1, Zenodo
+  # doi:10.5281/zenodo.20054559) so this script still runs end-to-end on
+  # public data alone.
+  # dataset_list = list(
+  #   dataset1 = "path/or/url/to/your_formatted_dataset1.csv"
+  #   #dataset2 = "...local path or url..."
+  # ),
   study_area_path = "https://zenodo.org/records/20492584/files/Wekeezhii_SouthernNWT_boreal_caribou_planning_range_regions.zip?download=1",
   land_cover_paths = list(
     land_cover1 = "https://datacube-prod-data-public.s3.ca-central-1.amazonaws.com/store/land/landcover/landcover-2010-classification.tif",

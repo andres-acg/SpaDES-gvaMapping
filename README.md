@@ -13,13 +13,15 @@ Both do the same thing and can be run interchangeably.
 
 ## What this script does
 
-1. Installs [`pak`](https://pak.r-lib.org/), then the development versions of [`Require`](https://github.com/PredictiveEcology/Require) and [`SpaDES.project`](https://github.com/PredictiveEcology/SpaDES.project) — the tooling `setupProject()` needs.
+1. Checks the running R version, then installs [`pak`](https://pak.r-lib.org/), followed by the development versions of [`Require`](https://github.com/PredictiveEcology/Require), [`reproducible`](https://github.com/PredictiveEcology/reproducible), [`SpaDES.tools`](https://github.com/PredictiveEcology/SpaDES.tools), and [`SpaDES.project`](https://github.com/PredictiveEcology/SpaDES.project) — the tooling `setupProject()` needs. `reproducible` and `SpaDES.tools` are installed explicitly, not left to be pulled in as transitive dependencies, because `SpaDES.core@development` needs both from their development branches specifically; leaving that to chance is what previously broke the script for a reviewer whose machine already had an older `reproducible` installed (`padYears` only exists on its development branch).
 2. Calls `setupProject()`, which:
    - creates a self-contained project folder (with its own package library, so nothing is installed into your regular R library),
-   - downloads the `gvaMapping` module from this GitHub account,
+   - downloads the `gvaMapping` module from a **pinned commit** on this GitHub account (not a floating branch — neither this repo nor `gvaMapping` has tags or releases, so a branch reference alone isn't reproducible),
    - installs every package the module declares as a dependency,
    - and sets up the study area, land cover, and disturbance inputs and the `gvaMapping` parameters (see below).
 3. Runs the module with `SpaDES.core::simInitAndSpades2()`.
+
+If you update the pinned `gvaMapping` commit in `globalscript.R`/`globalscriptCondensed.R` (e.g. to pick up further development), re-run the script yourself first — the pin exists so what a reviewer runs matches what you tested, so it should only change deliberately.
 
 ## Requirements
 
