@@ -65,10 +65,7 @@ projLocation <- "~/Projects"
 out <- setupProject(
   name = "SpaDES-gvaMapping",
   paths = list(projectPath = file.path(projLocation, "SpaDES-gvaMapping")),
-  ## Pinned to a specific version of the gvaMapping module, so this script
-  ## keeps working the same way even after the module is updated further.
-  ## Change this on purpose (and re-test) if you want a newer version.
-  modules = "andres-acg/gvaMapping@0cf28c5a5a9834254c128ef4c726f901a1441d50",
+  modules = "andres-acg/gvaMapping",
   times = list(start = 1, end = 1),
   Restart = TRUE,
   useGit = FALSE,
