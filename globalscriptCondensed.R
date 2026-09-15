@@ -50,10 +50,13 @@ options(repos = c(getOption("repos"), PE = "https://predictiveecology.r-universe
 if (!require("pak")) install.packages("pak")
 # Installs the specific package versions this script depends on -- see
 # globalscript.R for why these come from GitHub development branches.
+# httr2/curl are included explicitly since `reproducible` only Suggests them;
+# without them it silently falls back to a less robust downloader.
 pak::pak(c("PredictiveEcology/Require@development",
            "PredictiveEcology/reproducible@development",
            "PredictiveEcology/SpaDES.tools@development",
-           "PredictiveEcology/SpaDES.project@development"),
+           "PredictiveEcology/SpaDES.project@development",
+           "httr2", "curl"),
          lib = .libPaths(), ask = FALSE)
 Require::Require("SpaDES.project", install = FALSE)
 
