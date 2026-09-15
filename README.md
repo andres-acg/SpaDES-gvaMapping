@@ -4,9 +4,11 @@ The project-level driver script for [`gvaMapping`](https://github.com/andres-acg
 
 This repository does not contain any analysis code itself: `globalscript.R` sets up a self-contained SpaDES project, fetches the `gvaMapping` module from GitHub, configures its inputs and parameters, and runs it.
 
-## This example: lichen biomass in the Wek'èezhìi region
+## This example: caribou lichen biomass in the Southern NWT and Wek'èezhìı regions
 
-The configuration in this script is one worked example of using gvaMapping. It maps mean reindeer lichen (*Cladonia* spp.) biomass per land cover class from field plot data and land cover products covering the Wek'èezhìi region, Northwest Territories, as part of a backcasting/forecasting workflow for lichen biomass and caribou habitat developed for Andres Caseiro Guilhem's PhD thesis (Université Laval).
+The configuration in this script is one worked example of using gvaMapping. It maps mean caribou lichen (*Cladonia* spp.) biomass per land cover class from field plot data and land cover products covering the Southern NWT and Wek'èezhìı boreal caribou range planning regions, Northwest Territories, as part of a backcasting/forecasting workflow for lichen biomass and caribou habitat developed for Andres Caseiro Guilhem's PhD thesis (Université Laval) — producing the first predictive map of caribou lichen biomass for northwestern North America.
+
+This script's `land_cover_paths` use two of the four land cover products from the manuscript's own analysis (see "About gvaMapping" below): LCC10 and NTEMS. Because gvaMapping only needs a set of land cover rasters and matching parameters, it can equally be pointed at forecasted/projected land cover products to explore lichen biomass and caribou habitat under future climate and forest-change scenarios.
 
 ## How to use gvaMapping
 
@@ -42,35 +44,45 @@ If you update the pinned `gvaMapping` commit in `globalscript.R`/`globalscriptCo
 ## Requirements
 
 - **R 4.5 or newer.** Older versions haven't been tested.
-- **RStudio.** The setup/restart flow described below (and the "the RStudio project will reopen automatically" step) assumes RStudio is being used, not a plain `Rscript` run.
+- **Any R IDE** — RStudio, [Positron](https://positron.posit.co/), VS Code with the R extension, or a plain R console/`Rscript`. Nothing in this script or in `gvaMapping` itself is RStudio-specific; see "How to run it" below for how the setup step differs (only cosmetically) between IDEs.
 - **RTools** (Windows), so packages can be installed from source. Get the version matching your R install from <https://cran.r-project.org/bin/windows/Rtools/>.
 - **Internet access**, and some patience — see "What gets downloaded" below.
 
 ## How to run it
 
+`setupProject()`'s `Restart = TRUE` option (used below) automatically restarts and reopens the project in RStudio or Positron, since both let R packages hook into the IDE for that. Every other IDE doesn't support that hook, so `setupProject()` detects this and silently skips the restart, continuing in the current session instead — the pipeline itself runs identically either way.
+
+**In RStudio or Positron:**
+
 1. Copy the contents of `globalscript.R` (or `globalscriptCondensed.R`) into a new R script and save it anywhere — the name and location don't matter, but `global.R` is a reasonable choice.
-2. Open that script in RStudio and run it. The first run installs every required package into a project-specific library, which can take a while, and RStudio will automatically restart and reopen in the new project.
+2. Open that script and run it. The first run installs every required package into a project-specific library, which can take a while, and the IDE will automatically restart and reopen in the new project.
 3. Re-run the script after the restart. You can now delete the copy from step 1 — the same script has been copied into the project folder.
-4. For subsequent runs, open the project's own copy directly (`<projLocation>/SpaDES-gvaMapping/global.R`, where `projLocation` is whatever you set in the script — `~/Projects` by default) with its RStudio project (`.Rproj`) open, so the restart step is skipped.
+4. For subsequent runs, open the project's own copy directly (`<projLocation>/SpaDES-gvaMapping/global.R`, where `projLocation` is whatever you set in the script — `~/Projects` by default) with its project file open, so the restart step is skipped.
+
+**In VS Code, a plain R console, or via `Rscript`:**
+
+1. Copy the contents of `globalscript.R` (or `globalscriptCondensed.R`) into a new R script and save it anywhere.
+2. Run it (or `Rscript global.R` from a terminal). The first run installs every required package into a project-specific library, which can take a while. There's no restart step, so this single run does everything — start from a fresh R session (a new terminal, or a freshly opened R console) rather than one that's already loaded a lot of packages, since there's no automatic restart to fall back on if an already-loaded package conflicts with the version this script installs.
+3. For subsequent runs, use the project's own copy directly (`<projLocation>/SpaDES-gvaMapping/global.R`).
 
 Everything the script builds — the project folder, downloaded inputs, and computed outputs — is written under `projLocation`, **outside** this repository, and is not tracked by git (see `.gitignore`).
 
 ## What gets downloaded, and how long it takes
 
-By default this script's `land_cover_paths` point at two full, national-scale land cover rasters (Canada-wide 2010 land cover, and the NTEMS/VLCE2 product), plus a national fire-disturbance polygon layer and the Wek'èezhìi study area boundary. These are downloaded in full before being cropped to the study area, so the first run downloads several gigabytes of data and can take anywhere from tens of minutes to a few hours depending on your connection — this is expected, not a sign that something has failed. Every expensive step is cached, so a second run against the same output directory reuses what's already been computed rather than redoing it.
+By default this script's `land_cover_paths` point at two full, national-scale land cover rasters (Canada-wide 2010 land cover, and the NTEMS/VLCE2 product), plus a national fire-disturbance polygon layer and the Southern NWT and Wek'èezhìı boreal caribou range planning regions boundary. These are downloaded in full before being cropped to the study area, so the first run downloads several gigabytes of data and can take anywhere from tens of minutes to a few hours depending on your connection — this is expected, not a sign that something has failed. Every expensive step is cached, so a second run against the same output directory reuses what's already been computed rather than redoing it.
 
-If you'd rather run something lighter, unset `land_cover_paths` (and `study_area_path`) the same way `dataset_list` is left unset below — `gvaMapping`'s own `Init()` step will auto-fetch a smaller, study-area-cropped public land cover default (SCANFI) instead. See `gvaMapping`'s [README, "Running with no inputs"](https://github.com/andres-acg/gvaMapping#running-with-no-inputs-public-data-only-defaults).
+If you'd rather not set `land_cover_paths` (and `study_area_path`) explicitly, leave them unset the same way `dataset_list` is left unset below — `gvaMapping`'s own `Init()` step will auto-fetch the same public LCC10 and NTEMS land cover products used above. This doesn't reduce the download: it's the same two national-scale rasters, just fetched by the module instead of configured in this script. See `gvaMapping`'s [README, "Running with no inputs"](https://github.com/andres-acg/gvaMapping#running-with-no-inputs-public-data-only-defaults).
 
 ## Plot data
 
-This project's own analysis draws on several field plot datasets (`dataset_list`, referred to as `dataset1`–`dataset5` in `gvaMapping/R/preprocessing.R`). Their accessibility varies — some are private field data, others are hosted on repositories with their own access terms — but only one, dataset1 (Deninu Kué First Nation et al. 2026), is public, via Zenodo ([doi:10.5281/zenodo.20054559](https://doi.org/10.5281/zenodo.20054559)).
+This project's own analysis draws on several field plot datasets (`dataset_list`, referred to as `dataset1`–`dataset5` in `gvaMapping/R/preprocessing.R`). Their accessibility varies — some are private field data, others are hosted on repositories with their own access terms — but only one, dataset1 (Deninu Kųę́ First Nation et al. 2026), is public, via Zenodo ([doi:10.5281/zenodo.20054559](https://doi.org/10.5281/zenodo.20054559)).
 
 The `sideEffects` block in the script supports either of two ways to supply a dataset:
 
 - **Raw data** — assign its file path or URL to `raw_dataset1` (and `raw_dataset2`, `raw_dataset3`, etc. for additional datasets), and keep `preprocess <- TRUE`. Call the matching loader function for it from `gvaMapping/R/preprocessing.R` (one loader per raw data format); the result feeds into `dataset_list`.
 - **Already-formatted data** — set `preprocess <- FALSE` and point `dataset_list` directly at your own formatted file(s).
 
-By default, `raw_dataset1` is set to dataset1's own public Zenodo link, `preprocess` is `TRUE`, and it's loaded with `loadDeninuBiomassData()`, so the script builds dataset1 from that link and runs to completion end to end on public data alone, with no data of your own required. That same loader is also what the `gvaMapping` module itself falls back to if `dataset_list` is left out entirely — so the Zenodo link and the conversion logic live in exactly one place, `gvaMapping/R/preprocessing.R`, rather than being duplicated between this script and the module.
+By default, `raw_dataset1` is set to dataset1's own public Zenodo link, `preprocess` is `TRUE`, and it's loaded with `loadAndPrepRawDataset1()`, so the script builds dataset1 from that link and runs to completion end to end on public data alone, with no data of your own required. That same loader is also what the `gvaMapping` module itself falls back to if `dataset_list` is left out entirely — so the Zenodo link and the conversion logic live in exactly one place, `gvaMapping/R/preprocessing.R`, rather than being duplicated between this script and the module.
 
 ## Outputs
 
@@ -81,11 +93,11 @@ The module writes its results (the class-mean GVA table, GVA maps, an ensemble m
 - [`gvaMapping`](https://github.com/andres-acg/gvaMapping) — the module this script runs.
 - [`WB_LichenBiomass`](https://github.com/andres-acg/WB_LichenBiomass) — consumes `gvaMapping`'s class-mean table and applies it across the full landscape raster.
 
-## Citation
+## About gvaMapping
 
-If you use `gvaMapping`, please cite:
+`gvaMapping` is part of a manuscript currently under review at a scientific journal:
 
-> Guilhem, A.C., Barros, C., Degré-Timmons, G.É., Greuel, R.J., Errington, R.C., Baltzer, J.L., McIntire, E.J.B., Johnstone, J.F., & Cumming, S.G. gvaMapping: a SpaDES module for mapping ground vegetation attributes from plot data and land cover products. *Ecological Solutions and Evidence* (in review).
+> Guilhem, A.C., Barros, C., Degré-Timmons, G.É., Greuel, R.J., Errington, R.C., Baltzer, J.L., McIntire, E.J.B., Johnstone, J.F., & Cumming, S.G. *gvaMapping: a SpaDES module for mapping ground vegetation attributes from plot data and land cover products.*
 
 ## Author
 

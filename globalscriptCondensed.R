@@ -6,16 +6,33 @@
 ## * Please use R version 4.5 or higher -- older versions have not been tested
 ## * Install RTools to enable package installation from 'source' -- go to https://cran.r-project.org/bin/windows/Rtools/ and choose the appropriate version for you R version
 
-## The instructions that follow assume that RStudio is being used.
+## This script works the same way in any R IDE (RStudio, Positron, VS Code's R
+## extension, a plain R console, or `Rscript`) -- setupProject()'s Restart =
+## TRUE below only takes effect in RStudio or Positron; every other IDE
+## silently skips it and keeps running in the current session, so a single
+## run does everything.
 
+## In RStudio or Positron:
 ## 1. Copy this script to an R script and save it anywhere.
 ##    It doesn't matter where it is saved or the name, but I suggest `global.R` for the name.
-## 2. Run the script. It may take a while to install all packages the first time
-##    and RStudio will automatically restart and open the new project. The R script will be copied into the
+## 2. Run the script. It may take a while to install all packages the first time,
+##    and the IDE will automatically restart and open the new project. The R script will be copied into
 ##    the project folder and all packages will be installed into a project-specific library.
 ## 3. Re-run the script after the automatic restart. The original R script can now be deleted (from Step 1).
 ## 4. For future runs, use the SpaDES-gvaMapping/global.R, and to avoid the automatic restart,
-##    make sure the RStudio project is open.
+##    make sure the RStudio/Positron project is open.
+
+## In any other IDE (VS Code, a plain R console, `Rscript`):
+## 1. Copy this script to an R script and save it anywhere, then run it (or
+##    `Rscript global.R` from a terminal). It may take a while to install all
+##    packages the first time.
+## 2. That's it -- there's no restart step, so one run does everything. Best
+##    run from a fresh R session (a new terminal or a freshly started R
+##    console), since there's no automatic restart to fall back on if
+##    packages already loaded in an older session conflict with the versions
+##    this script installs.
+## 3. For future runs, use the copy at SpaDES-gvaMapping/global.R inside
+##    projLocation (set below).
 
 # ============================================================
 # SETUP ENVIRONMENT
@@ -53,6 +70,7 @@ out <- setupProject(
   times = list(start = 1, end = 1),
   Restart = TRUE,
   useGit = FALSE,
+  # INPUTS
   sideEffects = {
     # Supply raw data (raw_dataset1, raw_dataset2, ... + preprocess <- TRUE,
     # using a loader from preprocessing.R) or already-formatted data
@@ -65,13 +83,12 @@ out <- setupProject(
     preprocess <- TRUE
     if (preprocess) {
       source(file.path(paths$modulePath, "gvaMapping", "R", "preprocessing.R"))
-      dataset1 <- loadDeninuBiomassData(raw_dataset1)
+      dataset1 <- loadAndPrepRawDataset1(raw_dataset1)
       #dataset2 <- someOtherLoader(raw_dataset2)
     } else {
       dataset1 <- file.path(paths$inputPath, "datasets", "dataset1", "dataset1_formatted.csv")
     }
   },
-  # INPUTS
   dataset_list = list(
     dataset1 = dataset1
     #dataset2 = dataset2
