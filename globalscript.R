@@ -42,6 +42,12 @@ if (getRversion() < "4.5.0") {
        "You are running R ", getRversion(), ". Please install a newer R and retry.")
 }
 
+## R's default download timeout is 60 seconds -- too short for the land cover
+## rasters this script fetches (over a GB each), which can easily take longer
+## than that on an ordinary connection and would otherwise fail partway
+## through with a misleading "Timeout of 60 seconds was reached" error.
+options(timeout = max(1200, getOption("timeout")))
+
 options(repos = c(getOption("repos"), PE = "https://predictiveecology.r-universe.dev/"))
 if (!require("pak")) install.packages("pak")
 ## Installs the specific package versions this script depends on, from
