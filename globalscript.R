@@ -75,15 +75,21 @@ out <- setupProject(
   # ------------------------------------------------------------
   # PLOT DATASETS
   # ------------------------------------------------------------
-  sideEffects = {
+  ## dataset_list is built as one self-contained block below (rather than as
+  ## a `sideEffects` block feeding a separate `dataset_list` argument) because
+  ## setupProject() evaluates `sideEffects` in its own private scope: anything
+  ## it assigns (like `dataset1`) never becomes visible to another argument.
+  ## Building dataset_list here instead keeps everything in a single
+  ## expression, so ordinary R evaluates it top to bottom in one shared scope.
+  dataset_list = {
     ## Supply each plot dataset in one of two ways:
     ##  1. RAW data -- assign its file path or URL to raw_dataset1 (and
     ##     raw_dataset2, raw_dataset3, etc. for additional datasets), keep
     ##     preprocess <- TRUE, and call the matching loader function in
     ##     gvaMapping/R/preprocessing.R to convert it (one loader per raw
     ##     data format).
-    ##  2. ALREADY FORMATTED data -- set preprocess <- FALSE and point
-    ##     dataset_list (below) straight at your formatted file(s) instead.
+    ##  2. ALREADY FORMATTED data -- set preprocess <- FALSE and point the
+    ##     final list() below straight at your formatted file(s) instead.
     ##
     ## By default, raw_dataset1 is dataset1's own public link (Deninu Kue
     ## First Nation et al. 2026, via Zenodo), so this script runs end to end
@@ -101,11 +107,12 @@ out <- setupProject(
     } else {
       dataset1 <- file.path(paths$inputPath, "datasets", "dataset1", "dataset1_formatted.csv")
     }
+
+    list(
+      dataset1 = dataset1
+      #dataset2 = dataset2
+    )
   },
-  dataset_list = list(
-    dataset1 = dataset1
-    #dataset2 = dataset2
-  ),
   # ------------------------------------------------------------
   # STUDY AREA
   # ------------------------------------------------------------

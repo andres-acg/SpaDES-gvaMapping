@@ -71,13 +71,13 @@ Everything the script builds — the project folder, downloaded inputs, and comp
 
 By default this script's `land_cover_paths` point at two full, national-scale land cover rasters (Canada-wide 2010 land cover, and the NTEMS/VLCE2 product), plus a national fire-disturbance polygon layer and the Southern NWT and Wek'èezhìı boreal caribou range planning regions boundary. These are downloaded in full before being cropped to the study area, so the first run downloads several gigabytes of data and can take anywhere from tens of minutes to a few hours depending on your connection — this is expected, not a sign that something has failed. Every expensive step is cached, so a second run against the same output directory reuses what's already been computed rather than redoing it.
 
-If you'd rather not set `land_cover_paths` (and `study_area_path`) explicitly, leave them unset the same way `dataset_list` is left unset below — `gvaMapping`'s own `Init()` step will auto-fetch the same public LCC10 and NTEMS land cover products used above. This doesn't reduce the download: it's the same two national-scale rasters, just fetched by the module instead of configured in this script. See `gvaMapping`'s [README, "Running with no inputs"](https://github.com/andres-acg/gvaMapping#running-with-no-inputs-public-data-only-defaults).
+If you'd rather not set `land_cover_paths` (and `study_area_path`) explicitly, leave them out of the `setupProject()` call entirely — `gvaMapping`'s own `Init()` step will auto-fetch the same public LCC10 and NTEMS land cover products used above. This doesn't reduce the download: it's the same two national-scale rasters, just fetched by the module instead of configured in this script. See `gvaMapping`'s [README, "Running with no inputs"](https://github.com/andres-acg/gvaMapping#running-with-no-inputs-public-data-only-defaults).
 
 ## Plot data
 
 This project's own analysis draws on several field plot datasets (`dataset_list`, referred to as `dataset1`–`dataset5` in `gvaMapping/R/preprocessing.R`). Their accessibility varies — some are private field data, others are hosted on repositories with their own access terms — but only one, dataset1 (Deninu Kųę́ First Nation et al. 2026), is public, via Zenodo ([doi:10.5281/zenodo.20054559](https://doi.org/10.5281/zenodo.20054559)).
 
-The `sideEffects` block in the script supports either of two ways to supply a dataset:
+The `dataset_list` block in the script supports either of two ways to supply a dataset:
 
 - **Raw data** — assign its file path or URL to `raw_dataset1` (and `raw_dataset2`, `raw_dataset3`, etc. for additional datasets), and keep `preprocess <- TRUE`. Call the matching loader function for it from `gvaMapping/R/preprocessing.R` (one loader per raw data format); the result feeds into `dataset_list`.
 - **Already-formatted data** — set `preprocess <- FALSE` and point `dataset_list` directly at your own formatted file(s).

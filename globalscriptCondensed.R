@@ -71,10 +71,14 @@ out <- setupProject(
   Restart = TRUE,
   useGit = FALSE,
   # INPUTS
-  sideEffects = {
+  # dataset_list is one self-contained block (not a `sideEffects` block
+  # feeding a separate `dataset_list` argument) -- setupProject() evaluates
+  # `sideEffects` in its own private scope, so anything it assigns (like
+  # dataset1) never becomes visible to another argument. See globalscript.R.
+  dataset_list = {
     # Supply raw data (raw_dataset1, raw_dataset2, ... + preprocess <- TRUE,
     # using a loader from preprocessing.R) or already-formatted data
-    # (dataset_list below + preprocess <- FALSE) -- see globalscript.R.
+    # (point the final list() below at it + preprocess <- FALSE).
     raw_dataset1 <- paste0("https://zenodo.org/records/20054559/files/EA3922%20Lichen%20",
                            "Plot%20Data_ALL%20YEARS_SUMMARY%20BIOMASS%20three%20ways.xlsx",
                            "?download=1")
@@ -88,11 +92,12 @@ out <- setupProject(
     } else {
       dataset1 <- file.path(paths$inputPath, "datasets", "dataset1", "dataset1_formatted.csv")
     }
+
+    list(
+      dataset1 = dataset1
+      #dataset2 = dataset2
+    )
   },
-  dataset_list = list(
-    dataset1 = dataset1
-    #dataset2 = dataset2
-  ),
   study_area_path = "https://zenodo.org/records/20492584/files/Wekeezhii_SouthernNWT_boreal_caribou_planning_range_regions.zip?download=1",
   land_cover_paths = list(
     land_cover1 = "https://datacube-prod-data-public.s3.ca-central-1.amazonaws.com/store/land/landcover/landcover-2010-classification.tif",
