@@ -66,7 +66,7 @@ out <- setupProject(
   name = "SpaDES-gvaMapping",
   paths = list(projectPath = file.path(projLocation, "SpaDES-gvaMapping")),
   # Pinned to a specific module version -- see globalscript.R for why.
-  modules = "andres-acg/gvaMapping@ebdae7a094e019f3723a39b77ad3c4965b96c62a",
+  modules = "andres-acg/gvaMapping@0cf28c5a5a9834254c128ef4c726f901a1441d50",
   times = list(start = 1, end = 1),
   Restart = TRUE,
   useGit = FALSE,
