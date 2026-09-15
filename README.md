@@ -1,8 +1,24 @@
 # SpaDES-gvaMapping
 
-The project-level driver script for [`gvaMapping`](https://github.com/andres-acg/gvaMapping), a [SpaDES](https://spades.predictiveecology.org/) module that estimates mean ground vegetation attribute (GVA) values — in this project, reindeer lichen (*Cladonia* spp.) biomass — per land cover class, from field plot data and a land cover product.
+The project-level driver script for [`gvaMapping`](https://github.com/andres-acg/gvaMapping), a [SpaDES](https://spades.predictiveecology.org/) module that maps mean ground vegetation attribute (GVA) values per land cover class, from field plot data and one or more land cover products. gvaMapping is a generic tool — it isn't tied to any particular vegetation attribute, species, or region — see below and gvaMapping's own README for how to point it at your own data.
 
-This repository does not contain any analysis code itself: `globalscript.R` sets up a self-contained SpaDES project, fetches the `gvaMapping` module from GitHub, configures its inputs and parameters, and runs it. It is part of a backcasting/forecasting workflow for lichen biomass and caribou habitat in the Wek'èezhìi region, Northwest Territories, developed for Andres Caseiro Guilhem's PhD thesis (Université Laval).
+This repository does not contain any analysis code itself: `globalscript.R` sets up a self-contained SpaDES project, fetches the `gvaMapping` module from GitHub, configures its inputs and parameters, and runs it.
+
+## This example: lichen biomass in the Wek'èezhìi region
+
+The configuration in this script is one worked example of using gvaMapping. It maps mean reindeer lichen (*Cladonia* spp.) biomass per land cover class from field plot data and land cover products covering the Wek'èezhìi region, Northwest Territories, as part of a backcasting/forecasting workflow for lichen biomass and caribou habitat developed for Andres Caseiro Guilhem's PhD thesis (Université Laval).
+
+## How to use gvaMapping
+
+Whatever your GVA, species, or region, running gvaMapping only requires supplying:
+
+- **Plot data** (`dataset_list`) — one or more sets of GVA measurements at plot locations, either raw data with a matching loader (see "Plot data" below) or data that's already formatted.
+- **Land cover product(s)** (`land_cover_paths`) — one or more rasters classifying the landscape.
+- **Study area** (`study_area_path`) — a boundary used to filter plots and crop the land cover product(s).
+- **Disturbance data** (`disturbances_path`, optional) — a polygon layer used to exclude disturbed plots.
+- **A handful of parameters** describing your GVA and land cover classes: `measure_class`, `measure_name`, `unit`, `sampling_size_m2`, `target_gva`, `list_of_land_cover_names`, `land_cover_year`, `inapplicable_classes_list`, `water_classes_list`, and `abbrev_list` — see gvaMapping's own README, ["Key parameters"](https://github.com/andres-acg/gvaMapping#key-parameters), for what each one means.
+
+Everything else — filtering plots to the study area, extracting land cover classes, computing weighted means, cross-validation, and mapping — is handled by the module itself. This script is one worked example of supplying those inputs and parameters; swap in your own plot data, land cover product(s), study area, and parameters to apply gvaMapping to a different GVA, region, or dataset entirely.
 
 Two versions of the script are provided:
 
@@ -49,9 +65,12 @@ If you'd rather run something lighter, unset `land_cover_paths` (and `study_area
 
 This project's own analysis draws on several field plot datasets (`dataset_list`, referred to as `dataset1`–`dataset5` in `gvaMapping/R/preprocessing.R`). Their accessibility varies — some are private field data, others are hosted on repositories with their own access terms — but only one, dataset1 (Deninu Kué First Nation et al. 2026), is public, via Zenodo ([doi:10.5281/zenodo.20054559](https://doi.org/10.5281/zenodo.20054559)).
 
-Accordingly, `dataset_list` is deliberately left **unset** in this script by default (`preprocess <- FALSE` in the `sideEffects` block). With no `dataset_list` supplied, `gvaMapping`'s `Init()` step downloads and formats that same dataset1 record automatically, so the script still runs to completion, end to end, on public data alone, producing a real result from real (if more limited) data rather than a placeholder.
+The `sideEffects` block in the script supports either of two ways to supply a dataset:
 
-If you'd rather see that step happen directly in this script — or you have your own dataset(s) to add — set `preprocess <- TRUE` in the `sideEffects` block. It includes a working example that builds dataset1 straight from its Zenodo link, plus a place to add any other dataset you have access to, using whichever loader in `gvaMapping/R/preprocessing.R` matches its raw format; then uncomment `dataset_list` below it to point at the result.
+- **Raw data** — assign its file path or URL to `raw_dataset1` (and `raw_dataset2`, `raw_dataset3`, etc. for additional datasets), and keep `preprocess <- TRUE`. Call the matching loader function for it from `gvaMapping/R/preprocessing.R` (one loader per raw data format); the result feeds into `dataset_list`.
+- **Already-formatted data** — set `preprocess <- FALSE` and point `dataset_list` directly at your own formatted file(s).
+
+By default, `raw_dataset1` is set to dataset1's own public Zenodo link, `preprocess` is `TRUE`, and it's loaded with `loadDeninuBiomassData()`, so the script builds dataset1 from that link and runs to completion end to end on public data alone, with no data of your own required. That same loader is also what the `gvaMapping` module itself falls back to if `dataset_list` is left out entirely — so the Zenodo link and the conversion logic live in exactly one place, `gvaMapping/R/preprocessing.R`, rather than being duplicated between this script and the module.
 
 ## Outputs
 
@@ -61,6 +80,12 @@ The module writes its results (the class-mean GVA table, GVA maps, an ensemble m
 
 - [`gvaMapping`](https://github.com/andres-acg/gvaMapping) — the module this script runs.
 - [`WB_LichenBiomass`](https://github.com/andres-acg/WB_LichenBiomass) — consumes `gvaMapping`'s class-mean table and applies it across the full landscape raster.
+
+## Citation
+
+If you use `gvaMapping`, please cite:
+
+> Guilhem, A.C., Barros, C., Degré-Timmons, G.É., Greuel, R.J., Errington, R.C., Baltzer, J.L., McIntire, E.J.B., Johnstone, J.F., & Cumming, S.G. gvaMapping: a SpaDES module for mapping ground vegetation attributes from plot data and land cover products. *Ecological Solutions and Evidence* (in review).
 
 ## Author
 
