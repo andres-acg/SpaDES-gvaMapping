@@ -178,6 +178,9 @@ out <- setupProject(
           "230" = "230-Mixed.*"
         )
       ),
+      # Number of folds for k-fold cross-validation (per-product GVA raster
+      # CV, and the ensemble map CV when more than one product is supplied)
+      n_folds = 10,
       # Seed for reproducibility
       seed = 81
     )

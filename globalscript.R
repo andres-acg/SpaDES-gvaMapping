@@ -236,6 +236,14 @@ out <- setupProject(
       ),
       
       # ------------------------------------------------------------
+      # Cross-validation
+      # ------------------------------------------------------------
+      ## Number of folds for k-fold cross-validation (used for both the
+      ## per-land-cover-product GVA raster CV and, when more than one land
+      ## cover product is supplied, the ensemble map CV).
+      n_folds = 10,
+
+      # ------------------------------------------------------------
       # Seed for reproducibility
       # ------------------------------------------------------------
       seed = 81
