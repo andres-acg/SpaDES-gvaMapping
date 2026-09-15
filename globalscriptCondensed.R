@@ -64,7 +64,13 @@ projLocation <- "~/Projects"
 # ============================================================
 out <- setupProject(
   name = "SpaDES-gvaMapping",
-  paths = list(projectPath = file.path(projLocation, "SpaDES-gvaMapping")),
+  # outputPath is set explicitly -- otherwise setupProject() can inherit a
+  # stale, session-only temp-directory value for the `spades.outputPath`
+  # option instead of a folder inside the project.
+  paths = list(
+    projectPath = file.path(projLocation, "SpaDES-gvaMapping"),
+    outputPath  = file.path(projLocation, "SpaDES-gvaMapping", "outputs")
+  ),
   modules = "andres-acg/gvaMapping",
   times = list(start = 1, end = 1),
   Restart = TRUE,
