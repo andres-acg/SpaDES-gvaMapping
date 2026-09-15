@@ -54,29 +54,28 @@ out <- setupProject(
   Restart = TRUE,
   useGit = FALSE,
   sideEffects = {
-    # Set preprocess <- TRUE to build dataset_list from your own data -- see
-    # globalscript.R for the full explanation and a worked dataset1 example.
-    preprocess <- FALSE
+    # Supply raw data (raw_dataset1, raw_dataset2, ... + preprocess <- TRUE,
+    # using a loader from preprocessing.R) or already-formatted data
+    # (dataset_list below + preprocess <- FALSE) -- see globalscript.R.
+    raw_dataset1 <- paste0("https://zenodo.org/records/20054559/files/EA3922%20Lichen%20",
+                           "Plot%20Data_ALL%20YEARS_SUMMARY%20BIOMASS%20three%20ways.xlsx",
+                           "?download=1")
+    #raw_dataset2 <- "...path or url to your own raw dataset..."
+
+    preprocess <- TRUE
     if (preprocess) {
       source(file.path(paths$modulePath, "gvaMapping", "R", "preprocessing.R"))
-
-      dataset1_dir <- file.path(paths$inputPath, "datasets", "dataset1")
-      dir.create(dataset1_dir, recursive = TRUE, showWarnings = FALSE)
-      dataset1_raw <- reproducible::prepInputs(
-        url = paste0("https://zenodo.org/records/20054559/files/EA3922%20Lichen%20",
-                     "Plot%20Data_ALL%20YEARS_SUMMARY%20BIOMASS%20three%20ways.xlsx",
-                     "?download=1"),
-        destinationPath = dataset1_dir, fun = NA
-      )
-      write.csv(loadDeninuBiomassData(raw_datasetA = dataset1_raw),
-                file.path(dataset1_dir, "dataset1_formatted.csv"), row.names = FALSE)
+      dataset1 <- loadDeninuBiomassData(raw_dataset1)
+      #dataset2 <- someOtherLoader(raw_dataset2)
+    } else {
+      dataset1 <- file.path(paths$inputPath, "datasets", "dataset1", "dataset1_formatted.csv")
     }
   },
-  # INPUTS -- only takes effect once preprocess <- TRUE above.
-  # dataset_list = list(
-  #   dataset1 = file.path(paths$inputPath, "datasets", "dataset1", "dataset1_formatted.csv")
-  #   #dataset2 = "...local path or url..."
-  # ),
+  # INPUTS
+  dataset_list = list(
+    dataset1 = dataset1
+    #dataset2 = dataset2
+  ),
   study_area_path = "https://zenodo.org/records/20492584/files/Wekeezhii_SouthernNWT_boreal_caribou_planning_range_regions.zip?download=1",
   land_cover_paths = list(
     land_cover1 = "https://datacube-prod-data-public.s3.ca-central-1.amazonaws.com/store/land/landcover/landcover-2010-classification.tif",

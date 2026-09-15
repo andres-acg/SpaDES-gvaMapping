@@ -56,41 +56,39 @@ out <- setupProject(
   Restart = TRUE,
   useGit = FALSE,
   sideEffects = {
-    ## Set preprocess <- TRUE to build dataset_list (below) from your own
-    ## data, using the loader functions in gvaMapping/R/preprocessing.R (one
-    ## per raw data format). Left FALSE, gvaMapping downloads and formats a
-    ## public dataset (dataset1) automatically instead, so this script still
-    ## runs end to end with no data of your own.
-    preprocess <- FALSE
+    ## Supply each plot dataset in one of two ways:
+    ##  1. RAW data -- assign its file path or URL to raw_dataset1 (and
+    ##     raw_dataset2, raw_dataset3, etc. for additional datasets), keep
+    ##     preprocess <- TRUE, and call the matching loader function in
+    ##     gvaMapping/R/preprocessing.R to convert it (one loader per raw
+    ##     data format).
+    ##  2. ALREADY FORMATTED data -- set preprocess <- FALSE and point
+    ##     dataset_list (below) straight at your formatted file(s) instead.
+    ##
+    ## By default, raw_dataset1 is dataset1's own public link (Deninu Kue
+    ## First Nation et al. 2026, via Zenodo), so this script runs end to end
+    ## with no data of your own.
+    raw_dataset1 <- paste0("https://zenodo.org/records/20054559/files/EA3922%20Lichen%20",
+                           "Plot%20Data_ALL%20YEARS_SUMMARY%20BIOMASS%20three%20ways.xlsx",
+                           "?download=1")
+    #raw_dataset2 <- "...path or url to your own raw dataset..."
+
+    preprocess <- TRUE
     if (preprocess) {
       source(file.path(paths$modulePath, "gvaMapping", "R", "preprocessing.R"))
-
-      ## Example: build dataset1 directly from its own public link (Deninu
-      ## Kue First Nation et al. 2026, via Zenodo). Add any other dataset you
-      ## have the same way, using whichever loader in preprocessing.R matches
-      ## its raw format.
-      dataset1_dir <- file.path(paths$inputPath, "datasets", "dataset1")
-      dir.create(dataset1_dir, recursive = TRUE, showWarnings = FALSE)
-      dataset1_raw <- reproducible::prepInputs(
-        url = paste0("https://zenodo.org/records/20054559/files/EA3922%20Lichen%20",
-                     "Plot%20Data_ALL%20YEARS_SUMMARY%20BIOMASS%20three%20ways.xlsx",
-                     "?download=1"),
-        destinationPath = dataset1_dir, fun = NA
-      )
-      write.csv(loadDeninuBiomassData(raw_datasetA = dataset1_raw),
-                file.path(dataset1_dir, "dataset1_formatted.csv"), row.names = FALSE)
+      dataset1 <- loadDeninuBiomassData(raw_dataset1)
+      #dataset2 <- someOtherLoader(raw_dataset2)
+    } else {
+      dataset1 <- file.path(paths$inputPath, "datasets", "dataset1", "dataset1_formatted.csv")
     }
   },
   # ------------------------------------------------------------
   # PLOT DATASETS
   # ------------------------------------------------------------
-  # Only used once preprocess <- TRUE above. dataset1 here comes from the
-  # example above (built from its own link); add any other dataset(s) you
-  # have the same way, or point straight at an already-formatted file or URL.
-  # dataset_list = list(
-  #   dataset1 = file.path(paths$inputPath, "datasets", "dataset1", "dataset1_formatted.csv")
-  #   #dataset2 = "...local path or url..."
-  # ),
+  dataset_list = list(
+    dataset1 = dataset1
+    #dataset2 = dataset2
+  ),
   # ------------------------------------------------------------
   # STUDY AREA
   # ------------------------------------------------------------
