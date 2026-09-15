@@ -261,4 +261,11 @@ out2 <- SpaDES.core::simInitAndSpades2(out)
 # INSPECT/PLOT RESULTS
 # ============================================================
 
-## TBC
+## The module writes its results (class-mean GVA table, GVA maps, an
+## ensemble map and cross-validation map when more than one land cover
+## product is supplied, and diagnostic plots) to disk rather than returning
+## them as in-memory objects. Find them under:
+##   <projLocation>/SpaDES-gvaMapping/outputs/gvaMapping
+## e.g. ~/Projects/SpaDES-gvaMapping/outputs/gvaMapping by default -- adjust
+## for whatever projLocation and project name you set above. See
+## gvaMapping's own README, "Outputs", for what each file is.

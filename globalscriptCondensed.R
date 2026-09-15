@@ -196,4 +196,7 @@ out2 <- SpaDES.core::simInitAndSpades2(out)
 # INSPECT/PLOT RESULTS
 # ============================================================
 
-## TBC
+## Outputs (class-mean GVA table, GVA maps, ensemble/CV maps, plots) are
+## written to disk, not returned as in-memory objects. Find them under:
+##   <projLocation>/SpaDES-gvaMapping/outputs/gvaMapping
+## e.g. ~/Projects/SpaDES-gvaMapping/outputs/gvaMapping by default.
